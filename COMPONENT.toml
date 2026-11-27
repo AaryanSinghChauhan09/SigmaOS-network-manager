@@ -1,0 +1,8 @@
+[component]
+name = "network-manager"
+version = "0.1.0"
+category = "networking"
+description = "Declarative network interface and routing configuration"
+maintainer = "AaryanSinghChauhan09"
+license = "GPL-3.0-or-later"
+rolling = true
