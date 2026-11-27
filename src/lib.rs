@@ -198,4 +198,36 @@ mod tests {
         let err = nm.set_link_state("wlan99", LinkState::Up).unwrap_err();
         assert_eq!(err, NetError::InterfaceNotFound("wlan99".to_string()));
     }
+
+    // Arrange: manager with 2 interfaces
+    // Act: get_interface on each
+    // Assert: interface_count == 2, get_interface returns correct entry
+    #[test]
+    fn test_get_interface_returns_correct_entry_aaa() {
+        let mut nm = NetworkManager::new();
+        nm.add_interface(eth0()).unwrap();
+        nm.add_interface(NetInterface {
+            name: "wlan0".to_string(),
+            address: "192.168.1.50/24".to_string(),
+            mtu: 1500,
+            state: LinkState::Down,
+        }).unwrap();
+        assert_eq!(nm.interface_count(), 2);
+        let iface = nm.get_interface("wlan0").unwrap();
+        assert_eq!(iface.mtu, 1500);
+        assert_eq!(iface.state, LinkState::Down);
+    }
+
+    // Arrange: manager with eth0 + 2 routes, remove one
+    // Act: route_count after remove
+    // Assert: 1
+    #[test]
+    fn test_route_count_decrements_on_remove_aaa() {
+        let mut nm = NetworkManager::new();
+        nm.add_interface(eth0()).unwrap();
+        nm.add_route(Route { destination: "0.0.0.0/0".to_string(), gateway: "192.168.1.1".to_string(), interface: "eth0".to_string(), metric: 100 }).unwrap();
+        nm.add_route(Route { destination: "10.0.0.0/8".to_string(), gateway: "192.168.1.254".to_string(), interface: "eth0".to_string(), metric: 200 }).unwrap();
+        nm.remove_route("0.0.0.0/0").unwrap();
+        assert_eq!(nm.route_count(), 1);
+    }
 }
